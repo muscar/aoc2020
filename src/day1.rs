@@ -1,12 +1,8 @@
+use crate::part::Part;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
-pub enum Part {
-    Part1,
-    Part2,
-}
-
-pub fn part1(ns: &[i64], target: i64) -> Option<i64> {
+fn part1(ns: &[i64], target: i64) -> Option<i64> {
     let mut l = 0;
     let mut r = ns.len() - 1;
     while l < r {
@@ -21,7 +17,7 @@ pub fn part1(ns: &[i64], target: i64) -> Option<i64> {
     None
 }
 
-pub fn part2(ns: &[i64], target: i64) -> Option<i64> {
+fn part2(ns: &[i64], target: i64) -> Option<i64> {
     for i in 0..ns.len() - 1 {
         let mut l = i + 1;
         let mut r = ns.len() - 1;
