@@ -1,5 +1,9 @@
-use crate::part::Part;
-use std::io::{BufRead, BufReader};
+use crate::{part::Part, utils::parse_seq};
+
+use std::{
+    fmt::Debug,
+    io::{BufRead, BufReader},
+};
 use std::{fs::File, str::FromStr};
 
 #[derive(Debug)]
@@ -18,29 +22,28 @@ impl FromStr for Entry {
     type Err = &'static str;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let parts = s.split(':').map(|s| s.trim()).collect::<Vec<&str>>();
-        if parts.len() != 2 {
-            return Err("failed to parse entry");
+        match s.split(':').map(|s| s.trim()).collect::<Vec<&str>>()[..] {
+            [policy, password] => Ok(Self::new(
+                policy.parse().expect("failed to parse policy"),
+                password.to_string(),
+            )),
+            _ => Err("failed to parse entry"),
         }
-        Ok(Self::new(
-            parts[0].parse().expect("failed to parse policy"),
-            parts[1].to_string(),
-        ))
     }
 }
 
 #[derive(Debug)]
 struct Policy {
-    lower_bound: usize,
-    upper_bount: usize,
+    start: usize,
+    end: usize,
     character: char,
 }
 
 impl Policy {
-    fn new(lower_bound: usize, upper_bount: usize, character: char) -> Self {
+    fn new(start: usize, end: usize, character: char) -> Self {
         Self {
-            lower_bound,
-            upper_bount,
+            start,
+            end,
             character,
         }
     }
@@ -50,64 +53,49 @@ impl FromStr for Policy {
     type Err = &'static str;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let parts = s.split(' ').map(|s| s.trim()).collect::<Vec<&str>>();
-        if parts.len() != 2 {
-            return Err("failed to parse policy");
+        match s.split(' ').map(|s| s.trim()).collect::<Vec<&str>>()[..] {
+            [range, s] if s.len() == 1 => match parse_seq(range.split('-'))[..] {
+                [start, end] => Ok(Self::new(start, end, s.chars().next().unwrap())),
+                _ => Err("failed to parse range"),
+            },
+            _ => Err("failed to parse policy"),
         }
-        let range = parts[0]
-            .split('-')
-            .map(|s| s.trim().parse().expect("failed to parse number"))
-            .collect::<Vec<usize>>();
-        if range.len() != 2 {
-            return Err("failed to parse range");
-        }
-        if parts[1].len() != 1 {
-            return Err("failed to parse char");
-        }
-        Ok(Self::new(
-            range[0],
-            range[1],
-            parts[1].chars().nth(0).unwrap(),
-        ))
     }
 }
 
-fn part1(entries: &[Entry]) -> i64 {
-    let mut conforming = 0;
-    for e in entries.iter() {
-        let mut cnt = 0;
-        for c in e.password.chars() {
-            if c == e.policy.character {
-                cnt += 1;
-            }
-        }
-        if e.policy.lower_bound <= cnt && cnt <= e.policy.upper_bount {
-            conforming += 1;
-        }
-    }
-    conforming
+fn count_if<P>(entries: &[Entry], p: P) -> usize
+where
+    P: Fn(&Entry) -> bool,
+{
+    entries.iter().filter(|e| p(*e)).count()
 }
 
-fn part2(entries: &[Entry]) -> i64 {
-    let mut conforming = 0;
-    for e in entries.iter() {
+fn part1(entries: &[Entry]) -> usize {
+    count_if(entries, |e| {
+        let cnt = e
+            .password
+            .chars()
+            .filter(|c| *c == e.policy.character)
+            .count();
+        e.policy.start <= cnt && cnt <= e.policy.end
+    })
+}
+
+fn part2(entries: &[Entry]) -> usize {
+    count_if(entries, |e| {
         let c1 = e
             .password
             .chars()
-            .nth(e.policy.lower_bound - 1)
+            .nth(e.policy.start - 1)
             .expect("password too short");
         let c2 = e
             .password
             .chars()
-            .nth(e.policy.upper_bount - 1)
+            .nth(e.policy.end - 1)
             .expect("password too short");
-        if c1 == e.policy.character && c2 != e.policy.character
+        c1 == e.policy.character && c2 != e.policy.character
             || c1 != e.policy.character && c2 == e.policy.character
-        {
-            conforming += 1;
-        }
-    }
-    conforming
+    })
 }
 
 pub fn run(part: Part, input_path: &str) -> i64 {
@@ -122,7 +110,7 @@ pub fn run(part: Part, input_path: &str) -> i64 {
         })
         .collect::<Vec<Entry>>();
     match part {
-        Part::Part1 => part1(&entries),
-        Part::Part2 => part2(&entries),
+        Part::Part1 => part1(&entries) as i64,
+        Part::Part2 => part2(&entries) as i64,
     }
 }
