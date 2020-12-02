@@ -6,7 +6,7 @@ fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() != 3 {
         println!("usage: aoc2020 <day> <input>");
-        return
+        return;
     }
 
     println!("part1 answer={}", day1::run(day1::Part::Part1, &args[2]));
