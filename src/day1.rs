@@ -1,6 +1,6 @@
-use crate::{part::Part, utils::parse_seq};
+use crate::{part::Part, utils::parse_lines};
 use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io::BufReader;
 
 fn part1(ns: &[i64], target: i64) -> Option<i64> {
     let mut l = 0;
@@ -37,7 +37,7 @@ fn part2(ns: &[i64], target: i64) -> Option<i64> {
 pub fn run(part: Part, input_path: &str) -> i64 {
     let f = File::open(input_path).expect("failed to open input file");
     let reader = BufReader::new(f);
-    let mut ns = parse_seq(reader.lines().map(|s| s.expect("failed to read line")));
+    let mut ns = parse_lines(reader);
     ns.sort_unstable();
     match part {
         Part::Part1 => part1(&ns, 2020).unwrap(),

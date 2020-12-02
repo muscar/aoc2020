@@ -1,9 +1,9 @@
-use crate::{part::Part, utils::parse_seq};
-
-use std::{
-    fmt::Debug,
-    io::{BufRead, BufReader},
+use crate::{
+    part::Part,
+    utils::{count_if, parse_lines, parse_seq, split_trim},
 };
+
+use std::{fmt::Debug, io::BufReader};
 use std::{fs::File, str::FromStr};
 
 #[derive(Debug)]
@@ -12,21 +12,15 @@ struct Entry {
     password: String,
 }
 
-impl Entry {
-    fn new(policy: Policy, password: String) -> Self {
-        Self { policy, password }
-    }
-}
-
 impl FromStr for Entry {
     type Err = &'static str;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.split(':').map(|s| s.trim()).collect::<Vec<&str>>()[..] {
-            [policy, password] => Ok(Self::new(
-                policy.parse().expect("failed to parse policy"),
-                password.to_string(),
-            )),
+        match split_trim(s, ':')[..] {
+            [policy, password] => Ok(Self {
+                policy: policy.parse().expect("failed to parse policy"),
+                password: password.to_string(),
+            }),
             _ => Err("failed to parse entry"),
         }
     }
@@ -39,35 +33,22 @@ struct Policy {
     character: char,
 }
 
-impl Policy {
-    fn new(start: usize, end: usize, character: char) -> Self {
-        Self {
-            start,
-            end,
-            character,
-        }
-    }
-}
-
 impl FromStr for Policy {
     type Err = &'static str;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.split(' ').map(|s| s.trim()).collect::<Vec<&str>>()[..] {
+        match split_trim(s, ' ')[..] {
             [range, s] if s.len() == 1 => match parse_seq(range.split('-'))[..] {
-                [start, end] => Ok(Self::new(start, end, s.chars().next().unwrap())),
+                [start, end] => Ok(Self {
+                    start,
+                    end,
+                    character: s.chars().next().unwrap(),
+                }),
                 _ => Err("failed to parse range"),
             },
             _ => Err("failed to parse policy"),
         }
     }
-}
-
-fn count_if<P>(entries: &[Entry], p: P) -> usize
-where
-    P: Fn(&Entry) -> bool,
-{
-    entries.iter().filter(|e| p(*e)).count()
 }
 
 fn part1(entries: &[Entry]) -> usize {
@@ -101,14 +82,7 @@ fn part2(entries: &[Entry]) -> usize {
 pub fn run(part: Part, input_path: &str) -> i64 {
     let f = File::open(input_path).expect("failed to open input file");
     let reader = BufReader::new(f);
-    let entries = reader
-        .lines()
-        .map(|s| {
-            s.expect("failed to read line")
-                .parse()
-                .expect("failed to parse entry")
-        })
-        .collect::<Vec<Entry>>();
+    let entries = parse_lines(reader);
     match part {
         Part::Part1 => part1(&entries) as i64,
         Part::Part2 => part2(&entries) as i64,
