@@ -5,13 +5,13 @@ use std::io::{BufRead, BufReader};
 
 const TREE: u8 = b'#';
 
-fn count_trees(map: &[String], dx: usize, dy: usize) -> usize {
+fn count_trees(map: &[Vec<u8>], dx: usize, dy: usize) -> usize {
     let mut x = 0;
     let mut y = 0;
     let mut cnt = 0;
 
     while y < map.len() {
-        if map[y].as_bytes()[x] == TREE {
+        if map[y][x] == TREE {
             cnt += 1;
         }
         x = (x + dx) % map[y].len();
@@ -21,11 +21,11 @@ fn count_trees(map: &[String], dx: usize, dy: usize) -> usize {
     cnt
 }
 
-fn part1(map: &[String]) -> usize {
+fn part1(map: &[Vec<u8>]) -> usize {
     count_trees(map, 3, 1)
 }
 
-fn part2(map: &[String]) -> usize {
+fn part2(map: &[Vec<u8>]) -> usize {
     let deltas = [(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)];
     deltas
         .iter()
@@ -38,7 +38,7 @@ pub fn run(part: Part, input_path: &str) -> i64 {
     let reader = BufReader::new(f);
     let map = reader
         .lines()
-        .map(|l| l.expect("failed to read line"))
+        .map(|l| l.expect("failed to read line").into_bytes())
         .collect::<Vec<_>>();
     match part {
         Part::Part1 => part1(&map) as i64,
