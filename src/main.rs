@@ -3,7 +3,6 @@ use std::env;
 mod day1;
 mod day2;
 mod part;
-mod utils;
 
 fn main() {
     let days: Vec<&dyn Fn(part::Part, &str) -> i64> = vec![&day1::run, &day2::run];

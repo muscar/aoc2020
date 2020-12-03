@@ -1,6 +1,7 @@
-use crate::{part::Part, utils::parse_lines};
+use crate::part::Part;
+
 use std::fs::File;
-use std::io::BufReader;
+use std::io::{BufRead, BufReader};
 
 fn part1(ns: &[i64], target: i64) -> Option<i64> {
     let mut l = 0;
@@ -37,7 +38,11 @@ fn part2(ns: &[i64], target: i64) -> Option<i64> {
 pub fn run(part: Part, input_path: &str) -> i64 {
     let f = File::open(input_path).expect("failed to open input file");
     let reader = BufReader::new(f);
-    let mut ns = parse_lines(reader);
+    let mut ns = reader
+        .lines()
+        .map(|s| s.expect("failed to read line"))
+        .map(|l| l.parse().expect("failed to parse entry"))
+        .collect::<Vec<i64>>();
     ns.sort_unstable();
     match part {
         Part::Part1 => part1(&ns, 2020).unwrap(),

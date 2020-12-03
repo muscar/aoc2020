@@ -1,9 +1,6 @@
-use crate::{
-    part::Part,
-    utils::{count_if, parse_lines, parse_seq, split_trim},
-};
+use crate::part::Part;
 
-use std::{fmt::Debug, io::BufReader};
+use std::{fmt::Debug, io::BufRead, io::BufReader};
 use std::{fs::File, str::FromStr};
 
 #[derive(Debug)]
@@ -16,7 +13,7 @@ impl FromStr for Entry {
     type Err = &'static str;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match split_trim(s, ':')[..] {
+        match s.split(':').map(|s| s.trim()).collect::<Vec<&str>>()[..] {
             [policy, password] => Ok(Self {
                 policy: policy.parse().expect("failed to parse policy"),
                 password: password.to_string(),
@@ -37,52 +34,69 @@ impl FromStr for Policy {
     type Err = &'static str;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match split_trim(s, ' ')[..] {
-            [range, s] if s.len() == 1 => match parse_seq(range.split('-'))[..] {
-                [start, end] => Ok(Self {
-                    start,
-                    end,
-                    character: s.chars().next().unwrap(),
-                }),
-                _ => Err("failed to parse range"),
-            },
+        let mut parts = s.split(' ');
+        match (parts.next(), parts.next()) {
+            (Some(range), Some(s)) if s.len() == 1 => {
+                let mut xs = range.split('-');
+                match (xs.next(), xs.next()) {
+                    (Some(start), Some(end)) => Ok(Self {
+                        start: start.parse().expect("failed to parse start of range"),
+                        end: end.parse().expect("failed to parse end of range"),
+                        character: s.chars().next().unwrap(),
+                    }),
+                    _ => Err("failed to parse range"),
+                }
+            }
             _ => Err("failed to parse policy"),
         }
     }
 }
 
 fn part1(entries: &[Entry]) -> usize {
-    count_if(entries, |e| {
-        let cnt = e
-            .password
-            .chars()
-            .filter(|c| *c == e.policy.character)
-            .count();
-        e.policy.start <= cnt && cnt <= e.policy.end
-    })
+    entries
+        .iter()
+        .filter(|e| {
+            let cnt = e
+                .password
+                .chars()
+                .filter(|c| *c == e.policy.character)
+                .count();
+            e.policy.start <= cnt && cnt <= e.policy.end
+        })
+        .count()
 }
 
 fn part2(entries: &[Entry]) -> usize {
-    count_if(entries, |e| {
-        let c1 = e
-            .password
-            .chars()
-            .nth(e.policy.start - 1)
-            .expect("password too short");
-        let c2 = e
-            .password
-            .chars()
-            .nth(e.policy.end - 1)
-            .expect("password too short");
-        c1 == e.policy.character && c2 != e.policy.character
-            || c1 != e.policy.character && c2 == e.policy.character
-    })
+    entries
+        .iter()
+        .filter(|e| {
+            let c1 = e
+                .password
+                .chars()
+                .nth(e.policy.start - 1)
+                .expect("password too short");
+            let c2 = e
+                .password
+                .chars()
+                .nth(e.policy.end - 1)
+                .expect("password too short");
+            c1 == e.policy.character && c2 != e.policy.character
+                || c1 != e.policy.character && c2 == e.policy.character
+        })
+        .count()
 }
 
 pub fn run(part: Part, input_path: &str) -> i64 {
     let f = File::open(input_path).expect("failed to open input file");
     let reader = BufReader::new(f);
-    let entries = parse_lines(reader);
+    // let entries = parse_lines(reader);
+
+    let entries = reader
+        .lines()
+        .map(|s| s.expect("failed to read line"))
+        .map(|l| l.parse().expect("failed to parse entry"))
+        .collect::<Vec<Entry>>();
+
     match part {
         Part::Part1 => part1(&entries) as i64,
         Part::Part2 => part2(&entries) as i64,
