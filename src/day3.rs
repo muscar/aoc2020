@@ -3,13 +3,15 @@ use crate::part::Part;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
-fn count_trees(map: &[Vec<char>], dx: usize, dy: usize) -> usize {
+const TREE: u8 = b'#';
+
+fn count_trees(map: &[String], dx: usize, dy: usize) -> usize {
     let mut x = 0;
     let mut y = 0;
     let mut cnt = 0;
 
     while y < map.len() {
-        if map[y][x] == '#' {
+        if map[y].as_bytes()[x] == TREE {
             cnt += 1;
         }
         x = (x + dx) % map[y].len();
@@ -19,13 +21,16 @@ fn count_trees(map: &[Vec<char>], dx: usize, dy: usize) -> usize {
     cnt
 }
 
-fn part1(map: &[Vec<char>]) -> usize {
+fn part1(map: &[String]) -> usize {
     count_trees(map, 3, 1)
 }
 
-fn part2(map: &[Vec<char>]) -> usize {
+fn part2(map: &[String]) -> usize {
     let deltas = vec![(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)];
-    deltas.iter().map(|(dx, dy)| count_trees(map, *dx, *dy)).product()
+    deltas
+        .iter()
+        .map(|(dx, dy)| count_trees(map, *dx, *dy))
+        .product()
 }
 
 pub fn run(part: Part, input_path: &str) -> i64 {
@@ -33,10 +38,8 @@ pub fn run(part: Part, input_path: &str) -> i64 {
     let reader = BufReader::new(f);
     let map = reader
         .lines()
-        .map(|s| s.expect("failed to read line"))
-        .map(|l| l.chars().collect::<Vec<char>>())
-        .collect::<Vec<Vec<char>>>();
-
+        .map(|l| l.expect("failed to read line"))
+        .collect::<Vec<String>>();
     match part {
         Part::Part1 => part1(&map) as i64,
         Part::Part2 => part2(&map) as i64,
