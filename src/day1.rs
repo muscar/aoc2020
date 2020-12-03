@@ -42,7 +42,7 @@ pub fn run(part: Part, input_path: &str) -> i64 {
         .lines()
         .map(|s| s.expect("failed to read line"))
         .map(|l| l.parse().expect("failed to parse entry"))
-        .collect::<Vec<i64>>();
+        .collect::<Vec<_>>();
     ns.sort_unstable();
     match part {
         Part::Part1 => part1(&ns, 2020).unwrap(),

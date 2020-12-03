@@ -26,10 +26,10 @@ fn part1(map: &[String]) -> usize {
 }
 
 fn part2(map: &[String]) -> usize {
-    let deltas = vec![(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)];
+    let deltas = [(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)];
     deltas
         .iter()
-        .map(|(dx, dy)| count_trees(map, *dx, *dy))
+        .map(|&(dx, dy)| count_trees(map, dx, dy))
         .product()
 }
 
@@ -39,7 +39,7 @@ pub fn run(part: Part, input_path: &str) -> i64 {
     let map = reader
         .lines()
         .map(|l| l.expect("failed to read line"))
-        .collect::<Vec<String>>();
+        .collect::<Vec<_>>();
     match part {
         Part::Part1 => part1(&map) as i64,
         Part::Part2 => part2(&map) as i64,

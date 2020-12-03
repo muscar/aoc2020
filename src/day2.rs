@@ -13,7 +13,7 @@ impl FromStr for Entry {
     type Err = &'static str;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.split(':').map(|s| s.trim()).collect::<Vec<&str>>()[..] {
+        match s.split(':').map(|s| s.trim()).collect::<Vec<_>>()[..] {
             [policy, password] => Ok(Self {
                 policy: policy.parse().expect("failed to parse policy"),
                 password: password.to_string(),
@@ -95,7 +95,7 @@ pub fn run(part: Part, input_path: &str) -> i64 {
         .lines()
         .map(|s| s.expect("failed to read line"))
         .map(|l| l.parse().expect("failed to parse entry"))
-        .collect::<Vec<Entry>>();
+        .collect::<Vec<_>>();
 
     match part {
         Part::Part1 => part1(&entries) as i64,
