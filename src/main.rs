@@ -5,11 +5,12 @@ mod day2;
 mod day3;
 mod day4;
 mod day5;
+mod day6;
 mod part;
 
 fn main() {
     let days: Vec<&dyn Fn(part::Part, &str) -> i64> =
-        vec![&day1::run, &day2::run, &day3::run, &day4::run, &day5::run];
+        vec![&day1::run, &day2::run, &day3::run, &day4::run, &day5::run, &day6::run];
 
     let args: Vec<String> = env::args().collect();
     if args.len() != 3 {
