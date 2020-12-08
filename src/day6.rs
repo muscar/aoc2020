@@ -1,8 +1,8 @@
 use crate::part::Part;
 
-use std::{io::BufRead, collections::HashSet, fs::File, io::BufReader};
+use std::{collections::HashSet, fs::File, io::BufRead, io::BufReader};
 
-fn part1<It: Iterator<Item=String>>(mut it: It) -> usize {
+fn part1<It: Iterator<Item = String>>(mut it: It) -> usize {
     let mut cnt = 0;
     let mut group = HashSet::new();
     while let Some(l) = it.next() {
@@ -21,7 +21,7 @@ fn part1<It: Iterator<Item=String>>(mut it: It) -> usize {
     cnt
 }
 
-fn part2<It: Iterator<Item=String>>(mut it: It) -> usize {
+fn part2<It: Iterator<Item = String>>(mut it: It) -> usize {
     let mut cnt = 0;
     let mut group = HashSet::new();
     let mut new_group = true;
