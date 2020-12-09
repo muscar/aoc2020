@@ -1,5 +1,6 @@
 use std::env;
 
+mod part;
 mod day1;
 mod day2;
 mod day3;
@@ -8,7 +9,7 @@ mod day5;
 mod day6;
 mod day7;
 mod day8;
-mod part;
+mod day9;
 
 fn main() {
     let days: Vec<&dyn Fn(part::Part, &str) -> i64> = vec![
@@ -20,6 +21,7 @@ fn main() {
         &day6::run,
         &day7::run,
         &day8::run,
+        &day9::run,
     ];
 
     let args: Vec<String> = env::args().collect();
