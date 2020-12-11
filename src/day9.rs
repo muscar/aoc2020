@@ -4,17 +4,19 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 
 fn part1(ns: &[i64], preamble: usize) -> i64 {
-    ns.windows(preamble + 1).find_map(|x| {
-        let (target, ns) = x.split_last().unwrap();
-        for i in 0..ns.len() - 1 {
-            for j in i + 1..ns.len() {
-                if ns[i] + ns[j] == *target && ns[i] != ns[j] {
-                    return None;
+    ns.windows(preamble + 1)
+        .find_map(|x| {
+            let (&target, ns) = x.split_last().unwrap();
+            for i in 0..ns.len() - 1 {
+                for j in i + 1..ns.len() {
+                    if ns[i] + ns[j] == target && ns[i] != ns[j] {
+                        return None;
+                    }
                 }
             }
-        }
-        Some(*target)
-    }).unwrap()
+            Some(target)
+        })
+        .unwrap()
 }
 
 fn part2(ns: &[i64], target: i64) -> i64 {

@@ -1,7 +1,7 @@
 use crate::part::Part;
 
-use std::{fs::File, str::FromStr};
 use std::io::{BufRead, BufReader};
+use std::{fs::File, str::FromStr};
 
 #[derive(Clone, Copy, Debug)]
 enum Instr {
@@ -35,13 +35,13 @@ fn run_prog(prog: &[Instr]) -> Result<i64, i64> {
             Instr::Jmp(off) => {
                 ip = (ip as i64 + off) as usize;
                 continue;
-            },
+            }
             Instr::Nop(_) => (),
         }
         ip = ip + 1;
     }
     if ip >= prog.len() {
-        return Ok(acc)
+        return Ok(acc);
     }
     Err(acc)
 }
@@ -52,11 +52,15 @@ fn part1(prog: &[Instr]) -> i64 {
 
 fn part2(prog: &[Instr]) -> i64 {
     let mut off = 0;
-    while let Some(idx) = prog.iter().skip(off).position(|i| matches!(i, Instr::Jmp(_) | Instr::Nop(_))) {
+    while let Some(idx) = prog
+        .iter()
+        .skip(off)
+        .position(|i| matches!(i, Instr::Jmp(_) | Instr::Nop(_)))
+    {
         let instr = match prog[off + idx] {
             Instr::Nop(x) => Instr::Jmp(x),
             Instr::Jmp(x) => Instr::Nop(x),
-            i => i
+            i => i,
         };
         let patched = [&prog[..off + idx], &[instr], &prog[off + idx + 1..]].concat();
         if let Ok(x) = run_prog(&patched) {
