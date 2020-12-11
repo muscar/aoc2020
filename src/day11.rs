@@ -35,19 +35,15 @@ fn neighbour(map: &[Vec<u8>], x: usize, y: usize, dx: i32, dy: i32, mut fov: usi
     c
 }
 
-fn occupied_neighbours(map: &[Vec<u8>], x: usize, y: usize, fov: usize) -> usize {
-    DELTAS
-        .iter()
-        .filter_map(|(dx, dy)| neighbour(map, x, y, *dx, *dy, fov))
-        .filter(|&c| c == OCCUPIED)
-        .count()
-}
-
 fn step(map: &[Vec<u8>], tolerance: usize, fov: usize, out: &mut [Vec<u8>]) -> bool {
     let mut has_changes = false;
     for i in 0..map.len() {
         for j in 0..map[i].len() {
-            let nearby = occupied_neighbours(map, j, i, fov);
+            let nearby = DELTAS
+                .iter()
+                .filter_map(|(dx, dy)| neighbour(map, j, i, *dx, *dy, fov))
+                .filter(|&c| c == OCCUPIED)
+                .count();
             if map[i][j] == EMPTY && nearby == 0 {
                 out[i][j] = OCCUPIED;
                 has_changes = true;

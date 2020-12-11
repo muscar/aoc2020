@@ -31,14 +31,14 @@ fn run_prog(prog: &[Instr]) -> Result<i64, i64> {
     while ip < prog.len() && !seen[ip] {
         seen[ip] = true;
         match prog[ip] {
-            Instr::Acc(n) => acc = acc + n,
+            Instr::Acc(n) => acc += n,
             Instr::Jmp(off) => {
                 ip = (ip as i64 + off) as usize;
                 continue;
             }
             Instr::Nop(_) => (),
         }
-        ip = ip + 1;
+        ip += 1;
     }
     if ip >= prog.len() {
         return Ok(acc);

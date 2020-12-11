@@ -25,7 +25,7 @@ fn part2(ns: &[i64], target: i64) -> i64 {
         let mut off = 1;
         while acc < target {
             acc += ns[i + off];
-            off = off + 1;
+            off += 1;
         }
         if acc == target {
             let mut aux = ns[i..i + off].iter().collect::<Vec<_>>();

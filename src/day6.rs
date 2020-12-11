@@ -2,10 +2,10 @@ use crate::part::Part;
 
 use std::{collections::HashSet, fs::File, io::BufRead, io::BufReader};
 
-fn part1<It: Iterator<Item = String>>(mut it: It) -> usize {
+fn part1<It: Iterator<Item = String>>(it: It) -> usize {
     let mut cnt = 0;
     let mut group = HashSet::new();
-    while let Some(l) = it.next() {
+    for l in it {
         if l.is_empty() {
             cnt += group.len();
             group.clear();
@@ -21,11 +21,11 @@ fn part1<It: Iterator<Item = String>>(mut it: It) -> usize {
     cnt
 }
 
-fn part2<It: Iterator<Item = String>>(mut it: It) -> usize {
+fn part2<It: Iterator<Item = String>>(it: It) -> usize {
     let mut cnt = 0;
     let mut group = HashSet::new();
     let mut new_group = true;
-    while let Some(l) = it.next() {
+    for l in it {
         if l.is_empty() {
             cnt += group.len();
             group.clear();
@@ -37,7 +37,7 @@ fn part2<It: Iterator<Item = String>>(mut it: It) -> usize {
             new_group = false;
         } else {
             let xs: HashSet<char> = l.chars().collect();
-            group = group.intersection(&xs).map(|&c| c).collect();
+            group = group.intersection(&xs).copied().collect();
         }
     }
     if !group.is_empty() {

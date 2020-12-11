@@ -8,8 +8,8 @@ fn part1(ns: &[usize]) -> usize {
     let mut threes = 1;
     for i in 0..ns.len() - 1 {
         match ns[i + 1] - ns[i] {
-            1 => ones = ones + 1,
-            3 => threes = threes + 1,
+            1 => ones += 1,
+            3 => threes += 1,
             _ => panic!(),
         }
     }
